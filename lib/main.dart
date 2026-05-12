@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'core/theme/app_theme.dart';
+import 'features/movies/screens/home_screen.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -12,8 +15,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Movie App',
-      theme: ThemeData.dark(),
-      home: const Scaffold(body: Center(child: Text('Movie App'))),
+      theme: AppTheme.darkTheme,
+      home: const HomeScreen(),
     );
   }
 }
