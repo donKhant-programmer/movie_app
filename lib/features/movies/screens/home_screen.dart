@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:movie_app/core/constants/app_colors.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/movie_provider.dart';
 import '../screens/movie_detail_screen.dart';
-import '../widgets/error_widget.dart';
-import '../widgets/loading_widget.dart';
 import '../widgets/movie_card.dart';
 import '../widgets/movie_search_field.dart';
 
@@ -38,7 +37,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final currentScroll = _scrollController.position.pixels;
 
-    if (currentScroll >= maxScroll * 0.8) {
+    if (currentScroll >= maxScroll * 0.8 &&
+        !provider.isLoadingMore &&
+        provider.hasMore) {
       provider.loadMoreMovies();
     }
   }
@@ -79,85 +80,120 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Movie App'), centerTitle: true),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: MovieSearchField(
-              controller: _searchController,
-              onSearch: _searchMovies,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: MovieSearchField(
+                controller: _searchController,
+                onSearch: _searchMovies,
+              ),
             ),
-          ),
 
-          Expanded(
-            child: Builder(
-              builder: (_) {
-                /// INITIAL EMPTY
-                if (provider.movies.isEmpty &&
-                    !provider.isLoading &&
-                    provider.errorMessage.isEmpty) {
-                  return const Center(child: Text('Search movies to begin'));
-                }
-
-                /// LOADING
-                if (provider.isLoading && provider.movies.isEmpty) {
-                  return const LoadingWidget();
-                }
-
-                /// ERROR
-                if (provider.errorMessage.isNotEmpty &&
-                    provider.movies.isEmpty) {
-                  return CustomErrorWidget(message: provider.errorMessage);
-                }
-
-                return RefreshIndicator(
-                  onRefresh: () async {
-                    await provider.searchMovies(provider.currentQuery);
-                  },
-                  child: GridView.builder(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 4,
-                    ),
-                    itemCount:
-                        provider.movies.length +
-                        (provider.isLoadingMore ? 1 : 0),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: crossAxisCount,
-                      crossAxisSpacing: 14,
-                      mainAxisSpacing: 14,
-                      childAspectRatio: 0.62,
-                    ),
-                    itemBuilder: (context, index) {
-                      /// PAGINATION LOADER
-                      if (index >= provider.movies.length) {
-                        return const LoadingWidget();
-                      }
-
-                      final movie = provider.movies[index];
-
-                      return MovieCard(
-                        movie: movie,
-                        onTap: () {
-                          context.read<MovieProvider>().clearSelectedMovie();
-
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  MovieDetailScreen(imdbId: movie.imdbId),
+            Expanded(
+              child: provider.movies.isEmpty
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.movie_creation_outlined,
+                              size: 72,
+                              color: AppColors.textSecondary.withOpacity(0.5),
                             ),
-                          );
-                        },
-                      );
-                    },
-                  ),
-                );
-              },
+
+                            const SizedBox(height: 20),
+
+                            const Text(
+                              'Search Movies',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+
+                            const SizedBox(height: 10),
+
+                            Text(
+                              'Find your favorite movies, and series instantly.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 15,
+                                height: 1.5,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : Stack(
+                      children: [
+                        RefreshIndicator(
+                          onRefresh: () async {
+                            await provider.searchMovies(provider.currentQuery);
+                          },
+                          child: GridView.builder(
+                            controller: _scrollController,
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            padding: const EdgeInsets.fromLTRB(16, 4, 16, 80),
+                            itemCount: provider.movies.length,
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: crossAxisCount,
+                                  crossAxisSpacing: 14,
+                                  mainAxisSpacing: 14,
+                                  childAspectRatio: 0.62,
+                                ),
+                            itemBuilder: (context, index) {
+                              final movie = provider.movies[index];
+
+                              return MovieCard(
+                                movie: movie,
+                                onTap: () {
+                                  context
+                                      .read<MovieProvider>()
+                                      .clearSelectedMovie();
+
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => MovieDetailScreen(
+                                        imdbId: movie.imdbId,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ),
+
+                        /// BOTTOM PAGINATION LOADER
+                        if (provider.isLoadingMore)
+                          const Positioned(
+                            left: 0,
+                            right: 0,
+                            bottom: 16,
+                            child: Center(
+                              child: SizedBox(
+                                width: 26,
+                                height: 26,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
