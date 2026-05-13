@@ -87,32 +87,15 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           flexibleSpace: FlexibleSpaceBar(
             centerTitle: false,
 
-            titlePadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 12,
-            ),
-
-            title: Text(
-              movie.title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: AppColors.textPrimary,
-                fontWeight: FontWeight.bold,
-                shadows: [Shadow(blurRadius: 10, color: AppColors.shadow)],
-              ),
-            ),
-
             background: Stack(
               fit: StackFit.expand,
               children: [
-                /// IMAGE
                 CachedNetworkImage(
                   imageUrl: movie.poster,
                   fit: BoxFit.cover,
 
                   placeholder: (context, url) => Container(
-                    color: Colors.black,
+                    color: AppColors.background,
                     child: const Center(child: CircularProgressIndicator()),
                   ),
 
@@ -126,7 +109,6 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                   ),
                 ),
 
-                /// DARK OVERLAY
                 Container(
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
@@ -136,6 +118,26 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                         Colors.transparent,
                         Color(0x88000000),
                         AppColors.background,
+                      ],
+                    ),
+                  ),
+                ),
+
+                Positioned(
+                  left: 16,
+                  right: 16,
+                  bottom: 24,
+                  child: Text(
+                    movie.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 28,
+                      height: 1.15,
+                      shadows: [
+                        Shadow(blurRadius: 14, color: AppColors.shadow),
                       ],
                     ),
                   ),
