@@ -21,23 +21,6 @@ The project demonstrates clean architecture, API integration, state management, 
 
 The project follows a **feature-based clean structure**:
 
-lib/
-│
-├── core/
-│   ├── constants/
-│   ├── theme/
-│   └── network/
-│
-├── features/
-│   └── movies/
-│       ├── models/
-│       ├── providers/
-│       ├── screens/
-│       ├── services/
-│       └── widgets/
-│
-└── main.dart
-
 ---
 
 ## 🧠 State Management
