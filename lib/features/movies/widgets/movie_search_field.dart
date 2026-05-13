@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:movie_app/core/constants/app_colors.dart';
 
 class MovieSearchField extends StatelessWidget {
   final TextEditingController controller;
@@ -19,7 +20,7 @@ class MovieSearchField extends StatelessWidget {
       decoration: InputDecoration(
         hintText: 'Search movies...',
         filled: true,
-        fillColor: Colors.grey.shade900,
+        fillColor: AppColors.surface,
         prefixIcon: const Icon(Icons.search),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
