@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Movie App',
-        theme: AppTheme.darkTheme,
+        theme: AppTheme.dark,
         home: const HomeScreen(),
       ),
     );
